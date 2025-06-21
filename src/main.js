@@ -66,14 +66,17 @@ let arrPositionModel = [
   }
 ];
 
+
+const url = import.meta.env.BASE_URL + 'models/groupedisland.glb';
+
 loader.load(
-  '/delighted-games/groupedisland.glb',
+  url,
   (gltf) => {
-    island = gltf.scene;
+    const island = gltf.scene;
     island.scale.set(1, 1, 1);
     scene.add(island);
 
-    let bannerEntry = arrPositionModel.find((entry) => entry.id === 'banner');
+    const bannerEntry = arrPositionModel.find(e => e.id === 'banner');
     if (bannerEntry) {
       island.position.set(
         bannerEntry.position.x,
