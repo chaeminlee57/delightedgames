@@ -1,12 +1,10 @@
-import * as THREE from 'https://cdn.skypack.dev/three@0.129.0/build/three.module.js';
-import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js';
-import { gsap } from 'https://cdn.skypack.dev/gsap';
-
+// Reset scroll position
 if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
 }
 window.scrollTo(0, 0);
 
+// Three.js setup
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(0, 0, 50);
 
@@ -17,6 +15,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputEncoding = THREE.sRGBEncoding;
 document.getElementById('container3D').appendChild(renderer.domElement);
 
+// Lighting setup
 const ambientLight = new THREE.AmbientLight(0xffffff, 2);
 scene.add(ambientLight);
 
@@ -32,10 +31,12 @@ const pointLight = new THREE.PointLight(0xffffff, 2, 50);
 pointLight.position.set(0, 0, 0);
 scene.add(pointLight);
 
+// Model variables
 let island;
 let islandMixer;
-const loader = new GLTFLoader();
+const loader = new THREE.GLTFLoader();
 
+// Position configuration
 const ISLAND_CENTER_POSITION = { x: 0, y: 0, z: 0 };
 
 let arrPositionModel = [
@@ -66,16 +67,17 @@ let arrPositionModel = [
   }
 ];
 
-
-const url = import.meta.env.BASE_URL + 'models/groupedisland.glb';
+// Load GLB model
+const modelUrl = 'images/groupedisland.glb';
 
 loader.load(
-  url,
+  modelUrl,
   (gltf) => {
-    const island = gltf.scene;
+    island = gltf.scene;
     island.scale.set(1, 1, 1);
     scene.add(island);
 
+    // Set initial position
     const bannerEntry = arrPositionModel.find(e => e.id === 'banner');
     if (bannerEntry) {
       island.position.set(
@@ -90,6 +92,7 @@ loader.load(
       );
     }
 
+    // Improve texture quality
     island.traverse((child) => {
       if (child.isMesh && child.material.map) {
         child.material.map.anisotropy = renderer.capabilities.getMaxAnisotropy();
@@ -106,6 +109,7 @@ loader.load(
   }
 );
 
+// Model movement based on scroll
 function modelMove() {
   if (!island) return;
 
@@ -124,6 +128,7 @@ function modelMove() {
 
   const { position, rotation } = arrPositionModel[idx];
 
+  // Use GSAP for smooth animations
   gsap.to(island.position, {
     x: position.x,
     y: position.y,
@@ -141,6 +146,7 @@ function modelMove() {
   });
 }
 
+// Render loop
 function reRender3D() {
   requestAnimationFrame(reRender3D);
   renderer.render(scene, camera);
@@ -148,6 +154,7 @@ function reRender3D() {
 }
 reRender3D();
 
+// Event listeners
 window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
